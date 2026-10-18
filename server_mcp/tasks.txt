@@ -1,0 +1,3 @@
+Dani will prototype a visual progress tracker for module pages by next week
+Arjun to design a lightweight “quick recap” section before quizzes to test if it improves retention
+Jenna to draft 2–3 motivational nudge email templates for A/B testing

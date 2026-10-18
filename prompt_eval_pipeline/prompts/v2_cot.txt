@@ -1,0 +1,6 @@
+Analyze the review step by step:
+1. Identify positive words
+2. Identify negative words  
+3. Determine overall sentiment
+
+Return only: positive, negative, or neutral

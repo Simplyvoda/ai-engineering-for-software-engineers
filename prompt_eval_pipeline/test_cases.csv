@@ -1,0 +1,11 @@
+id,input,expected,category,difficulty
+review_1,"Amazing place, would stay again","positive",simple,easy
+review_2,"Terrible experience","negative",simple,easy
+review_3,"It was fine","neutral",simple,easy
+review_4,"Great views but wifi was slow","positive",mixed,medium
+review_5,"Rude host but clean place","negative",mixed,medium
+review_6,"Beautiful listing, bad communication","positive",mixed,hard
+review_7,"Perfect location and very friendly host","positive",simple,easy
+review_8,"Dirty and smelly rooms","negative",simple,easy
+review_9,"Not bad, acceptable for the price","neutral",simple,easy
+review_10,"Love the decor but the bed was uncomfortable","positive",mixed,hard

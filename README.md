@@ -92,13 +92,6 @@ python mcp_client.py              # then open http://127.0.0.1:7860
 
 In `multi_mcp_client.py`, `/resources` lists the resources each server provides, and `/resource <server> <uri>` loads one into the conversation, for example `/resource tasks file://meeting_notes`. The `/prompts` and `/prompt` commands are currently commented out in that client.
 
-## Notes from the multimodal capstone
-
-- **Pass references, not data.** The agent first had one tool return the image as base64 text and a second tool receive it. That forced the model to copy about 42,000 characters back out as a tool argument, which hung or produced a broken request. Now the vision tool takes a file path and reads the image itself, so the model only handles the path.
-- **Wikipedia needs a User-Agent.** The `wikipedia` package's default User-Agent is shared by every user of the package, and Wikipedia rate-limits it. `wikipedia_server.py` sets its own.
-- **Gradio 6 changes.** Chat history is a list of `{"role": ..., "content": ...}` messages rather than tuples, and the theme is passed to `launch()`. The app also forces light mode, which Gradio otherwise takes from the OS setting.
-- **Free-tier limits.** Gemini's free tier allows a limited number of requests per model per day, and each image question uses several. When you hit a `429 RESOURCE_EXHAUSTED` error, wait for the reset or set `GEMINI_MODEL` to another model, which has its own limit.
-
 ## Path modules
 
 1. How LLMs Actually Work

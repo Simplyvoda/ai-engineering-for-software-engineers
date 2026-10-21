@@ -13,3 +13,7 @@ __pycache__/
 
 # macOS
 .DS_Store
+
+# Google ADK: local chat sessions and generated research reports
+.adk/
+ai_agent/*report*.txt

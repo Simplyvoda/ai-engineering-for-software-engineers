@@ -13,6 +13,7 @@ Each folder is a self-contained project built while working through the path.
 | [`server_mcp/`](server_mcp/) | Two MCP servers (weather and tasks) and LangGraph clients that connect to one or many servers and use their tools, prompts and resources | MCP tools, prompts and resources, multi-server clients, agents |
 | [`multimodal_capstone_project/`](multimodal_capstone_project/) | Image Research Assistant: a web app where you upload an image and ask a question. A LangGraph agent chains two MCP servers, one that describes the image with Gemini and one that researches it on Wikipedia | Multimodal input, tool chaining across MCP servers, agents, Gradio UI |
 | [`ai_agent/`](ai_agent/) | Three agents built with Google's Agent Development Kit (ADK): a greeter with structured input and output, a research assistant that writes a report from Wikipedia, arXiv and Google Search, and a multi-agent version where a controller delegates to specialist agents | ADK agents, tools, structured output, multi-agent orchestration, agents as tools |
+| [`retrieval_augmented_generation/qa_system_multiple_files/`](retrieval_augmented_generation/qa_system_multiple_files/) | Document Q&A: a Streamlit app where you upload one or more PDF or text files and ask a question. It splits the files into chunks, stores their embeddings in Chroma, and answers from the chunks closest in meaning to the question | RAG, chunking, embeddings, vector databases, retrievers, LangChain chains |
 
 The loose scripts at the top level are short examples of patterns for calling LLMs from production code:
 
@@ -36,14 +37,14 @@ cp .env.example .env
 
 | Key | Used by | Get one at |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | `llm-cli-tool`, `prompt_eval_pipeline`, top-level scripts | https://platform.openai.com/api-keys |
+| `OPENAI_API_KEY` | `llm-cli-tool`, `prompt_eval_pipeline`, `retrieval_augmented_generation`, top-level scripts | https://platform.openai.com/api-keys |
 | `GOOGLE_GEMINI_API_KEY` | `server_mcp`, `multimodal_capstone_project` | https://aistudio.google.com/apikey |
 | `OPENWEATHERMAP_API_KEY` | `server_mcp` weather server | https://home.openweathermap.org/api_keys |
 | `GEMINI_MODEL` | `server_mcp`, `multimodal_capstone_project` | For example `gemini-3.5-flash` |
 | `GOOGLE_API_KEY` | `ai_agent` (ADK reads this name) | The same key as `GOOGLE_GEMINI_API_KEY` |
 | `ADK_MODEL` | `ai_agent` research agents | For example `gemini-3.5-flash-lite` |
 
-`.env` is listed in `.gitignore`, so your keys stay on your machine. The MCP projects, `llm-cli-tool` and the ADK agents load the file automatically. `prompt_eval_pipeline` and the top-level scripts read `OPENAI_API_KEY` from the shell environment, so export it before running them:
+`.env` is listed in `.gitignore`, so your keys stay on your machine. The MCP projects, `llm-cli-tool`, the ADK agents and the RAG app load the file automatically. `prompt_eval_pipeline` and the top-level scripts read `OPENAI_API_KEY` from the shell environment, so export it before running them:
 
 ```bash
 export OPENAI_API_KEY="your-key"
@@ -68,6 +69,7 @@ If you rename or move a project folder, delete its `.venv` and create it again, 
 | `server_mcp` | `pip install python-dotenv mcp langgraph langchain-core langchain-google-genai langchain-mcp-adapters requests` |
 | `multimodal_capstone_project` | `pip install python-dotenv mcp langgraph langchain-core langchain-google-genai langchain-mcp-adapters google-genai wikipedia gradio` |
 | `ai_agent` | `pip install google-adk wikipedia arxiv` |
+| `retrieval_augmented_generation/qa_system_multiple_files` | `pip install -r requirements.txt` |
 
 The three agents in `ai_agent/` share one virtual environment, `ai_agent/.venv`. Activate that one before running `adk`, not the one in this folder.
 
@@ -99,6 +101,10 @@ python mcp_client.py              # then open http://127.0.0.1:7860
 cd ai_agent
 adk web                           # browser UI: pick an agent from the list
 adk run multi_agent_research_assistant   # or chat in the terminal
+
+# RAG: ask questions across uploaded PDFs and text files
+cd retrieval_augmented_generation/qa_system_multiple_files
+streamlit run main.py            # then open http://localhost:8501
 ```
 
 For the research agents, type a topic such as `Research CRISPR gene editing`. They save the report as a text file in `ai_agent/`. Running `python agent.py` on its own only defines the agent and exits.

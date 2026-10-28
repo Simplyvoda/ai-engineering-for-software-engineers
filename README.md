@@ -14,6 +14,7 @@ Each folder is a self-contained project built while working through the path.
 | [`multimodal_capstone_project/`](multimodal_capstone_project/) | Image Research Assistant: a web app where you upload an image and ask a question. A LangGraph agent chains two MCP servers, one that describes the image with Gemini and one that researches it on Wikipedia | Multimodal input, tool chaining across MCP servers, agents, Gradio UI |
 | [`ai_agent/`](ai_agent/) | Three agents built with Google's Agent Development Kit (ADK): a greeter with structured input and output, a research assistant that writes a report from Wikipedia, arXiv and Google Search, and a multi-agent version where a controller delegates to specialist agents | ADK agents, tools, structured output, multi-agent orchestration, agents as tools |
 | [`retrieval_augmented_generation/qa_system_multiple_files/`](retrieval_augmented_generation/qa_system_multiple_files/) | Document Q&A: a Streamlit app where you upload one or more PDF or text files and ask a question. It splits the files into chunks, stores their embeddings in Chroma, and answers from the chunks closest in meaning to the question | RAG, chunking, embeddings, vector databases, retrievers, LangChain chains |
+| [`weather-agent/`](weather-agent/) | Weather agent built with LangGraph. It looks up each city's coordinates, fetches current conditions from the free Open-Meteo API, and writes a one-line answer per city. Failed requests are retried with exponential backoff, and tool errors are passed back to the model instead of crashing the graph | LangGraph state graphs, tool-calling loops, retries, error handling, offline tests |
 
 The loose scripts at the top level are short examples of patterns for calling LLMs from production code:
 
@@ -37,14 +38,14 @@ cp .env.example .env
 
 | Key | Used by | Get one at |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | `llm-cli-tool`, `prompt_eval_pipeline`, `retrieval_augmented_generation`, top-level scripts | https://platform.openai.com/api-keys |
+| `OPENAI_API_KEY` | `llm-cli-tool`, `prompt_eval_pipeline`, `retrieval_augmented_generation`, `weather-agent`, top-level scripts | https://platform.openai.com/api-keys |
 | `GOOGLE_GEMINI_API_KEY` | `server_mcp`, `multimodal_capstone_project` | https://aistudio.google.com/apikey |
 | `OPENWEATHERMAP_API_KEY` | `server_mcp` weather server | https://home.openweathermap.org/api_keys |
 | `GEMINI_MODEL` | `server_mcp`, `multimodal_capstone_project` | For example `gemini-3.5-flash` |
 | `GOOGLE_API_KEY` | `ai_agent` (ADK reads this name) | The same key as `GOOGLE_GEMINI_API_KEY` |
 | `ADK_MODEL` | `ai_agent` research agents | For example `gemini-3.5-flash-lite` |
 
-`.env` is listed in `.gitignore`, so your keys stay on your machine. The MCP projects, `llm-cli-tool`, the ADK agents and the RAG app load the file automatically. `prompt_eval_pipeline` and the top-level scripts read `OPENAI_API_KEY` from the shell environment, so export it before running them:
+`.env` is listed in `.gitignore`, so your keys stay on your machine. `weather-agent` is the exception: it reads its own `.env` inside its folder, so copy `weather-agent/.env.example` to `weather-agent/.env` and add your OpenAI key there. It needs no weather API key, because Open-Meteo is free. The MCP projects, `llm-cli-tool`, the ADK agents and the RAG app load the file automatically. `prompt_eval_pipeline` and the top-level scripts read `OPENAI_API_KEY` from the shell environment, so export it before running them:
 
 ```bash
 export OPENAI_API_KEY="your-key"
@@ -70,6 +71,7 @@ If you rename or move a project folder, delete its `.venv` and create it again, 
 | `multimodal_capstone_project` | `pip install python-dotenv mcp langgraph langchain-core langchain-google-genai langchain-mcp-adapters google-genai wikipedia gradio` |
 | `ai_agent` | `pip install google-adk wikipedia arxiv` |
 | `retrieval_augmented_generation/qa_system_multiple_files` | `pip install -r requirements.txt` |
+| `weather-agent` | `pip install -r requirements.txt` |
 
 The three agents in `ai_agent/` share one virtual environment, `ai_agent/.venv`. Activate that one before running `adk`, not the one in this folder.
 
@@ -105,6 +107,12 @@ adk run multi_agent_research_assistant   # or chat in the terminal
 # RAG: ask questions across uploaded PDFs and text files
 cd retrieval_augmented_generation/qa_system_multiple_files
 streamlit run main.py            # then open http://localhost:8501
+
+# Weather agent: run the built-in examples, ask your own question, or run the tests
+cd weather-agent
+python main.py
+python main.py "What's the weather in Abuja?"
+pytest -q                         # offline tests, no key or internet needed
 ```
 
 For the research agents, type a topic such as `Research CRISPR gene editing`. They save the report as a text file in `ai_agent/`. Running `python agent.py` on its own only defines the agent and exits.
